@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       User.hasOne(models.Auth, {
         foreignKey: {
-          name: "userId",
+          name: 'userId',
           allowNull: false,
         },
       });
@@ -19,17 +19,26 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      name: DataTypes.STRING,
-      age: DataTypes.INTEGER,
-      role: {
-        type: DataTypes.ENUM(["Owner", "Staff"]),
-        defaultValue: "Staff",
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
-      address: DataTypes.STRING,
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      role: {
+        type: DataTypes.ENUM(['Owner', 'Staff']),
+        defaultValue: 'Staff',
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: 'User',
     }
   );
   return User;
