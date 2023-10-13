@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: false,
         },
       });
+
+      User.belongsTo(models.Shop, {
+        foreignKey: 'shopId',
+      });
     }
   }
   User.init(
@@ -33,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       address: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      shopId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },

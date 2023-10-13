@@ -1,11 +1,20 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { Auth, User } = require("../models");
-const ApiError = require("../utils/apiError");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { Auth, User } = require('../models');
+const ApiError = require('../utils/apiError');
 
 const register = async (req, res, next) => {
   try {
-    const { name, email, password, confirmPassword, age, address } = req.body;
+    const {
+      name,
+      email,
+      password,
+      confirmPassword,
+      age,
+      address,
+      role,
+      shopId,
+    } = req.body;
 
     // validasi untuk check apakah email nya udah ada
     const user = await Auth.findOne({
@@ -15,29 +24,52 @@ const register = async (req, res, next) => {
     });
 
     if (user) {
-      next(new ApiError("User email already taken", 400));
+      next(
+        new ApiError(
+          'User email already taken',
+          400
+        )
+      );
     }
 
     // minimum password length
     const passwordLength = password <= 8;
     if (passwordLength) {
-      next(new ApiError("Minimum password must be 8 character", 400));
+      next(
+        new ApiError(
+          'Minimum password must be 8 character',
+          400
+        )
+      );
     }
 
     // minimum password length
     if (password !== confirmPassword) {
-      next(new ApiError("password does not match", 400));
+      next(
+        new ApiError(
+          'password does not match',
+          400
+        )
+      );
     }
 
     // hashing password
     const saltRounds = 10;
-    const hashedPassword = bcrypt.hashSync(password, saltRounds);
-    const hashedConfirmPassword = bcrypt.hashSync(confirmPassword, saltRounds);
+    const hashedPassword = bcrypt.hashSync(
+      password,
+      saltRounds
+    );
+    const hashedConfirmPassword = bcrypt.hashSync(
+      confirmPassword,
+      saltRounds
+    );
 
     const newUser = await User.create({
       name,
       address,
       age,
+      role,
+      shopId,
     });
     const test = await Auth.create({
       email,
@@ -49,7 +81,7 @@ const register = async (req, res, next) => {
     console.log(test);
 
     res.status(201).json({
-      status: "Success",
+      status: 'Success',
       data: {
         ...newUser,
         email,
@@ -70,10 +102,13 @@ const login = async (req, res, next) => {
       where: {
         email,
       },
-      include: ["User"],
+      include: ['User'],
     });
 
-    if (user && bcrypt.compareSync(password, user.password)) {
+    if (
+      user &&
+      bcrypt.compareSync(password, user.password)
+    ) {
       //   token utk autentikasi
       const token = jwt.sign(
         {
@@ -86,12 +121,17 @@ const login = async (req, res, next) => {
       );
 
       res.status(200).json({
-        status: "Success",
-        message: "Berhasil login",
+        status: 'Success',
+        message: 'Berhasil login',
         data: token,
       });
     } else {
-      next(new ApiError("wrong password atau user gak ada", 400));
+      next(
+        new ApiError(
+          'wrong password atau user gak ada',
+          400
+        )
+      );
     }
   } catch (err) {
     next(new ApiError(err.message, 500));

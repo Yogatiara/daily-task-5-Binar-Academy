@@ -1,22 +1,18 @@
 const ApiError = require('../utils/apiError');
-const { User, Shop } = require('../models');
+const { Shop, Product } = require('../models');
 
-const createUser = async (req, res, next) => {
+const createshop = async (req, res, next) => {
   try {
-    const { name, age, address, role, shopId } =
-      req.body;
-    const newDataUser = await User.create({
-      shopId: shopId,
-      name: name,
-      age: age,
-      address: address,
-      role: role,
+    const { name } = req.body;
+
+    const newDataShop = await Shop.create({
+      name,
     });
 
-    res.status(200).json({
+    await res.status(200).json({
       status: 'Success',
       data: {
-        newDataUser,
+        newDataShop,
       },
     });
   } catch (err) {
@@ -24,44 +20,30 @@ const createUser = async (req, res, next) => {
   }
 };
 
-const getUser = async (req, res, next) => {
+const getShop = async (req, res, next) => {
   try {
-    const { name, shopId } = req.query;
+    const { name } = req.query;
     if (name) {
-      const userData = await User.findOne({
+      const shopData = await Shop.findOne({
         where: {
           name: name,
         },
-
         returning: true,
       });
       res.status(200).json({
         status: 'Success',
         data: {
-          userData,
-        },
-      });
-    } else if (shopId) {
-      const userData = await User.findOne({
-        where: {
-          shopId: shopId,
-        },
-        returning: true,
-      });
-      res.status(200).json({
-        status: 'Success',
-        data: {
-          userData,
+          shopData,
         },
       });
     } else {
-      const userData = await User.findAll({
-        include: Shop,
+      const shopdata = await Shop.findAll({
+        include: Product,
       });
       res.status(200).json({
         status: 'Success',
         data: {
-          userData,
+          shopdata,
         },
       });
     }
@@ -70,25 +52,26 @@ const getUser = async (req, res, next) => {
   }
 };
 
-const deleteUser = async (req, res, next) => {
+const deleteShop = async (req, res, next) => {
   const { name } = req.query;
 
   try {
-    const user = await User.findOne({
+    const product = await Shop.findOne({
       where: {
         name: name,
       },
     });
 
-    if (!user) {
+    if (!product) {
       return next(
         new ApiError(
-          `Data user with this ${name} does not exist`,
+          `Shop with this ${name} does not exist`,
           400
         )
       );
     }
-    const userData = await User.destroy({
+
+    const shopData = await Shop.destroy({
       where: {
         name: name,
       },
@@ -97,7 +80,7 @@ const deleteUser = async (req, res, next) => {
     res.status(200).json({
       status: 'Success',
       data: {
-        userData,
+        shopData,
       },
     });
   } catch (err) {
@@ -105,30 +88,27 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-const updateUser = async (req, res, next) => {
+const updateShop = async (req, res, next) => {
   try {
-    const { name, age, address, role, shopId } =
-      req.body;
-    const userData = await User.update(
+    const { name, age, address, role } = req.body;
+    const ShopData = await Shop.update(
       {
         name: name,
         age: age,
         address: address,
         role: role,
-        shopId: shopId,
       },
       {
         where: {
           name: req.query.name,
         },
-
         returning: true,
       }
     );
     res.status(200).json({
       status: 'Success',
       data: {
-        userData,
+        ShopData,
       },
     });
   } catch (err) {
@@ -137,8 +117,8 @@ const updateUser = async (req, res, next) => {
 };
 
 module.exports = {
-  createUser,
-  getUser,
-  deleteUser,
-  updateUser,
+  createshop,
+  getShop,
+  deleteShop,
+  updateShop,
 };
